@@ -9,9 +9,11 @@ import sys
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 class MainWindow(QMainWindow):
+    global menu
  
 
     def __init__(self, *args, **kwargs):
+        global menu_btn
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.tabs = QTabWidget()
@@ -58,16 +60,31 @@ class MainWindow(QMainWindow):
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         navtb.addWidget(self.urlbar)
-        
-        stop_btn_icon = (dir_path + r'\stop.png')
-        stop_btn = QAction("Stop", self)
-        stop_btn.setIcon(QIcon(stop_btn_icon))
-        stop_btn.setStatusTip("Stop loading current page")
-        stop_btn.triggered.connect(lambda: self.tabs.currentWidget().stop())
-        navtb.addAction(stop_btn)
+
+        settings_icon = (dir_path + r'\Settings_icon.png')
+
+
+        menu_btn_icon = (dir_path + r'\menu_icon.png')
+        menu_btn = QPushButton(self)
+        menu_btn.setIcon(QIcon(menu_btn_icon))
+        menu_btn.setIconSize(QSize(23, 23))
+        menu_btn.setStatusTip("Открыть меню")
+
+        menu = QMenu(menu_btn)
+        settings = QAction()
+        settings.setIcon(QIcon(settings_icon))
+        settings.setText("Настройки")
+        menu.addAction(settings)     
+
+        def menu_func():
+           menu.exec()   
+
+        menu_btn.clicked.connect(menu_func)
+        navtb.addWidget(menu_btn)
+
         self.add_new_tab(QUrl('http://google.com'), 'Homepage')
         self.show()
-        self.setWindowTitle("CloudWeb")
+        self.setWindowTitle("CloudWeb")   
  
     
     def add_new_tab(self, qurl = None, label ="Blank"):
@@ -88,6 +105,7 @@ class MainWindow(QMainWindow):
         if i == -1:
             self.add_new_tab(qurl=QUrl("http://dzen.ru"))
 
+    
     def current_tab_changed(self, i):
         qurl = self.tabs.currentWidget().url()
         self.update_urlbar(qurl, self.tabs.currentWidget())
@@ -120,6 +138,7 @@ class MainWindow(QMainWindow):
         self.urlbar.setCursorPosition(0)
 
 app = QApplication(sys.argv)
-app.setApplicationName("Geek PyQt5")
+app.setApplicationName("CloudWeb")
+app.setStyle("Fusion")
 window = MainWindow()
 app.exec()
